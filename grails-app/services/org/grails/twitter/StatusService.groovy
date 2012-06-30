@@ -27,42 +27,37 @@ class StatusService {
         timelineService.clearTimelineCacheForUser(status.author.username)
     }
 
-    void follow(long personId) {
+    /* Change the "followed" status for the specified person for the current user.  
+     * If the personId is for a user already in the current user's "followed" set, 
+     * then remove the person from the set, otherwise add them to the set.
+     * 
+     * @param personId  the id of the person whose followed status should be toggled
+     * */
+
+    void toggleFollow(long personId) {
 
         def person = Person.get(personId)
-        Person currentUser = lookupCurrentPerson()
-        println("\nfollowing =========  person is " + personId+ " " + person)
         if (person) {
+            Person currentUser = lookupCurrentPerson()
+            if (isFollowed(personId)){
+                currentUser.removeFromFollowed(person)
+            }
+            else{
+                currentUser.addToFollowed(person)
+            }
 
-            println "was following: " + currentUser.getFollowed()
-            currentUser.addToFollowed(person)
-            println "now following: " + currentUser.getFollowed()
+            timelineService.clearTimelineCacheForUser(currentUser.username)
         }
-
-        timelineService.clearTimelineCacheForUser(currentUser.username)
     }
 
-    void unfollow(long personId) {
 
-        Person person = Person.get(personId)
-        println("\nUnfollow=========  person is " + personId+ " " + person)
-        Person currentUser = lookupCurrentPerson()
-        if (person) {
-
-            println "was following: " + currentUser.getFollowed()
-            def unfollow = currentUser.removeFromFollowed(person)
-            println "now following: " + currentUser.getFollowed()
-        }
-        timelineService.clearTimelineCacheForUser(currentUser.username)
-    }
-
-    boolean isfollowed(long personId) {
+    boolean isFollowed(long personId) {
         def person = Person.get(personId)
-        println("\n=========  person is " + personId+ " " + person)
+        // println("\n=========  person is " + personId+ " " + person)
         if (person) {
             def currentUser = lookupCurrentPerson()
             Set followingUsers = currentUser.getFollowed()
-            println "---following: " + followingUsers
+            // println "---following: " + followingUsers
             followingUsers.contains(person)
         }
     }

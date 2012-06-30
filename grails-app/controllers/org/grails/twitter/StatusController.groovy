@@ -25,19 +25,7 @@ class StatusController {
     }
 
     def toggleFollow(long id) {
-        if (statusService.isfollowed(id))
-            statusService.unfollow(id)
-        else
-            statusService.follow(id)
-        redirect action: 'index'
-    }
-
-    def follow(long id) {
-        statusService.follow id
-        redirect action: 'index'
-    }
-    def unfollow(long id) {
-        statusService.unfollow id
+        statusService.toggleFollow(id)
         redirect action: 'index'
     }
 }
