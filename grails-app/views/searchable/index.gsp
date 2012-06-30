@@ -6,7 +6,7 @@
 <body>
         <g:each var="person" in="${searchResult?.results}" status="counter">
         <div id="search_result_${counter}">
-            <span class="real_name">${person.realName}</span> <g:link id="${person.id}" action="follow" controller="status">follow</g:link>
+            <span class="real_name">${person.realName}</span> <g:link id="${person.id}" action="toggleFollow" controller="status">ToggleFollowStatus</g:link>
             </div>
         </g:each>
 </body>

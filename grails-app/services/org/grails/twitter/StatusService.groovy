@@ -11,12 +11,10 @@ class StatusService {
 
     def springSecurityService
     def timelineService
-    
+
     void onMessage(newMessageUserName) {
         log.debug "Message received. New status message posted by user <${newMessageUserName}>."
-        def following = Person.where {
-            followed.username == newMessageUserName
-        }.property('username').list()
+        def following = Person.where { followed.username == newMessageUserName }.property('username').list()
         following.each { uname ->
             timelineService.clearTimelineCacheForUser(uname)
         }
@@ -30,11 +28,42 @@ class StatusService {
     }
 
     void follow(long personId) {
+
         def person = Person.get(personId)
+        Person currentUser = lookupCurrentPerson()
+        println("\nfollowing =========  person is " + personId+ " " + person)
+        if (person) {
+
+            println "was following: " + currentUser.getFollowed()
+            currentUser.addToFollowed(person)
+            println "now following: " + currentUser.getFollowed()
+        }
+
+        timelineService.clearTimelineCacheForUser(currentUser.username)
+    }
+
+    void unfollow(long personId) {
+
+        Person person = Person.get(personId)
+        println("\nUnfollow=========  person is " + personId+ " " + person)
+        Person currentUser = lookupCurrentPerson()
+        if (person) {
+
+            println "was following: " + currentUser.getFollowed()
+            def unfollow = currentUser.removeFromFollowed(person)
+            println "now following: " + currentUser.getFollowed()
+        }
+        timelineService.clearTimelineCacheForUser(currentUser.username)
+    }
+
+    boolean isfollowed(long personId) {
+        def person = Person.get(personId)
+        println("\n=========  person is " + personId+ " " + person)
         if (person) {
             def currentUser = lookupCurrentPerson()
-            currentUser.addToFollowed(person)
-            timelineService.clearTimelineCacheForUser(currentUser.username)
+            Set followingUsers = currentUser.getFollowed()
+            println "---following: " + followingUsers
+            followingUsers.contains(person)
         }
     }
 
